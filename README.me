@@ -1,41 +1,141 @@
+# Taller III – Bases de Datos I
 
-# Taller III - Bases de Datos I
+## Sistema de Gestión de Reservas para un Hotel
 
-## Sistema de Gestion de Reservas para un Hotel
+**Estudiante:** Kevinn Andrés Cuervo Ríos  
+**Universidad:** Universidad de Manizales  
+**Programa:** Ingeniería de Sistemas y Telecomunicaciones  
+**Asignatura:** Bases de Datos I  
+**Modalidad:** Individual  
+**Estado:** Desarrollo y pruebas del taller completados
 
-**Estudiante:** Kevinn Andres Cuervo Rios
+## Descripción del proyecto
 
-**Universidad:** Universidad de Manizales
+Este proyecto implementa en **PostgreSQL 18** una base de datos para gestionar clientes, habitaciones, reservas y pagos de un hotel. Incluye la creación del modelo físico, restricciones de integridad, datos sintéticos, operaciones DML, consultas SQL, vistas y pruebas de transacciones. También contiene tres ejercicios de **NL2SQL**: consultas propuestas por inteligencia artificial, conservadas en su versión original y ejecutadas para revisar sus resultados.
 
-**Programa:** Ingenieria de Sistemas y Telecomunicaciones
+El trabajo se desarrolló con scripts SQL independientes y control de versiones mediante Git y GitHub.
 
-**Asignatura:** Bases de Datos I
+## Tecnologías y herramientas
 
-**Modalidad:** Individual
+- PostgreSQL 18: sistema gestor de bases de datos.
+- pgAdmin 4: ejecución de scripts y consulta de resultados.
+- Visual Studio Code: edición y organización de los archivos SQL.
+- Git y GitHub: control de versiones.
+- ChatGPT: apoyo en la generación de datos sintéticos y las consultas NL2SQL, posteriormente revisadas y ejecutadas.
 
-## Objetivo
+**Base de datos utilizada:** `hotel_reservas`.
 
-Implementar una base de datos en PostgreSQL para gestionar los clientes, habitaciones, reservas y pagos de un hotel, garantizando la integridad de los datos y permitiendo realizar consultas y reportes.
+## Modelo de datos
 
-## Herramientas utilizadas
+El sistema está compuesto por cuatro tablas relacionadas:
 
-- PostgreSQL 18
-- pgAdmin 4 version 9.19
-- Visual Studio Code
-- Git
-- GitHub
+| Tabla | Finalidad | Clave primaria |
+|---|---|---|
+| `cliente` | Información básica y nacionalidad de los huéspedes. | `id_cliente` |
+| `habitacion` | Número, tipo, precio por noche y estado de cada habitación. | `id_habitacion` |
+| `reserva` | Relación entre cliente y habitación, fechas y estado de la reserva. | `id_reserva` |
+| `pago` | Pagos asociados a una reserva, con fecha, monto y método. | `id_pago` |
 
-## Estructura del proyecto
+Relaciones implementadas:
 
-El taller se desarrolla en seis partes:
+- `reserva.id_cliente` → `cliente.id_cliente`.
+- `reserva.id_habitacion` → `habitacion.id_habitacion`.
+- `pago.id_reserva` → `reserva.id_reserva`.
 
-1. Diseno fisico y DDL.
-2. Restricciones e integridad.
-3. Datos sinteticos con inteligencia artificial.
-4. Manipulacion de datos y consultas SQL.
-5. Vistas y transacciones.
-6. NL2SQL con controles de seguridad.
+Las claves foráneas utilizan `ON UPDATE CASCADE` y `ON DELETE RESTRICT`.
 
-## Estado del proyecto
+## Integridad de datos
 
-Configuracion inicial del entorno de desarrollo y del repositorio Git.
+Se implementaron restricciones `PRIMARY KEY`, `FOREIGN KEY`, `NOT NULL`, `UNIQUE` y siete restricciones `CHECK` para validar tipos y estados de habitaciones, precios positivos, fechas de reserva, estados de reserva, montos positivos y métodos de pago permitidos.
+
+Además, se utiliza la extensión `btree_gist` y una restricción `EXCLUDE` para impedir la superposición de reservas **confirmadas** en una misma habitación. Los intervalos se modelan como `[fecha_entrada, fecha_salida)`, permitiendo que una nueva reserva comience el mismo día en que termina la anterior.
+
+## Datos sintéticos y resultados de referencia
+
+Se cargó y verificó el siguiente conjunto de datos ficticios:
+
+| Concepto | Cantidad |
+|---|---:|
+| Clientes | 20 |
+| Habitaciones | 10 |
+| Reservas | 30 |
+| Reservas confirmadas | 28 |
+| Reservas canceladas | 2 |
+| Pagos | 30 |
+| Reservas con al menos un pago | 24 |
+
+Los pagos registrados se distribuyen en 12 con tarjeta, 11 por transferencia y 7 en efectivo. El monto total recaudado en los datos sintéticos es **$22.665.000 COP**. Las fechas de las reservas y pagos de prueba se concentran entre octubre y diciembre de 2026.
+
+Estos valores describen el conjunto de datos utilizado en el taller; no corresponden a información de un hotel real.
+
+## Archivos SQL del proyecto
+
+Los siguientes scripts están organizados en la raíz del repositorio y documentan las etapas del desarrollo:
+
+| Archivo | Contenido |
+|---|---|
+| `01_creacion_modelo_fisico.sql` | Creación de las tablas `cliente`, `habitacion`, `reserva` y `pago`. |
+| `02_modificacion_estado_reserva.sql` | Incorporación de la columna `estado_reserva` mediante `ALTER TABLE`. |
+| `03_restricciones_integridad.sql` | Incorporación de siete restricciones `CHECK`. |
+| `04_control_reservas_superpuestas.sql` | Extensión `btree_gist` y restricción `EXCLUDE`. |
+| `05_pruebas_integridad.sql` | Tres pruebas positivas y tres negativas con transacciones y `ROLLBACK`. |
+| `06_carga_datos_sinteticos.sql` | Inserción y verificación de clientes, habitaciones, reservas y pagos ficticios. |
+| `07_operaciones_dml.sql` | Ejemplos de actualización de habitación, registro de pago y cancelación de reserva, revertidos con `ROLLBACK`. |
+| `08_consultas_basicas.sql` | Consultas 1 a 3: filtros y reservas según condiciones de fecha. |
+| `09_consultas_join.sql` | Consultas 4 y 5: relaciones entre tablas mediante `JOIN`. |
+| `10_consultas_agrupacion.sql` | Consultas 6 a 15: funciones de agregación, `GROUP BY` y `HAVING`. |
+| `11_consultas_subconsultas.sql` | Consultas 16 a 20: comparaciones y subconsultas. |
+| `12_vistas_hotel.sql` | Creación y verificación de dos vistas. |
+| `13_transaccion_acid.sql` | Pruebas de transacciones con `ROLLBACK`, `COMMIT` y limpieza controlada. |
+| `14_validacion_nl2sql.sql` | Tres consultas originales generadas mediante IA para su revisión y validación. |
+
+## Consultas y vistas
+
+Se desarrollaron **20 consultas SQL** distribuidas en tres consultas básicas, dos consultas `JOIN`, diez consultas de agrupación y cinco consultas con subconsultas.
+
+Las dos vistas creadas son:
+
+- **`vista_reservas_activas`**: muestra reservas confirmadas vigentes de acuerdo con `CURRENT_DATE`; su resultado cambia según la fecha de consulta.
+- **`vista_ingresos_mensuales`**: agrupa los pagos registrados por mes y calcula la cantidad de pagos y el total recaudado.
+
+## Transacciones y propiedades ACID
+
+Las pruebas incluyen `BEGIN`, `ROLLBACK` y `COMMIT`. Se verificó la inserción conjunta de una reserva y su pago inicial, la reversión de ambas operaciones y su confirmación en una segunda prueba. Posteriormente se eliminaron de forma controlada los registros creados exclusivamente para las pruebas y se verificaron los conteos originales.
+
+Se documentaron las propiedades de **atomicidad, consistencia, aislamiento y durabilidad**. Las pruebas se efectuaron en una misma conexión; el aislamiento entre sesiones concurrentes se explicó de forma conceptual, sin una prueba experimental específica.
+
+## Validación NL2SQL
+
+Se plantearon tres preguntas de negocio diferentes de las consultas anteriores:
+
+1. Reservas confirmadas con saldo pendiente, incluidos pagos parciales.
+2. Porcentaje de ingresos efectivamente recaudados por nacionalidad.
+3. Días libres entre reservas confirmadas consecutivas de una misma habitación.
+
+Las consultas generadas por ChatGPT se conservaron sin cambios en `14_validacion_nl2sql.sql` y se ejecutaron en pgAdmin. Sus resultados fueron revisados como parte de la auditoría documentada en el informe. Para estas pruebas se emplearon consultas de solo lectura.
+
+## Orientación para reproducir las pruebas
+
+1. Instalar PostgreSQL 18 y disponer de pgAdmin 4.
+2. Crear una base de datos vacía denominada `hotel_reservas`.
+3. Conectarse a esa base y ejecutar **en orden** los scripts `01` a `04` para preparar el modelo y sus restricciones.
+4. Ejecutar `06_carga_datos_sinteticos.sql` **una sola vez**, revisando cada bloque y sus conteos antes de confirmar las transacciones de inserción.
+5. Ejecutar individualmente los casos de `05_pruebas_integridad.sql` y `07_operaciones_dml.sql`. Algunas pruebas negativas producen errores intencionales; finalizar cada caso con `ROLLBACK` en la misma conexión.
+6. Ejecutar las consultas `08` a `11` y verificar sus resultados.
+7. Ejecutar `12_vistas_hotel.sql` para crear y consultar las vistas.
+8. Utilizar `13_transaccion_acid.sql` **solo como guía de pruebas por bloques**: no ejecutar el archivo completo automáticamente. La limpieza documentada utiliza un identificador de reserva (`39`) específico de la ejecución original, que puede ser distinto en otra base de datos.
+9. Ejecutar por separado las consultas de `14_validacion_nl2sql.sql`, preferiblemente dentro de una transacción de solo lectura.
+
+**Precaución:** los scripts de creación, restricciones y carga de datos no están diseñados para repetirse indiscriminadamente sobre una base ya poblada. Para reproducir el proyecto desde cero, utilizar una base de datos nueva y verificar los resultados antes de confirmar cualquier cambio.
+
+## Evidencias y documentación
+
+El informe académico del taller contiene la explicación de las seis partes del proyecto, capturas de ejecución en pgAdmin y evidencias del control de versiones. Las fotografías y el documento de entrega complementan los archivos SQL del repositorio; no se presupone que todos estos materiales estén publicados en GitHub.
+
+Las capturas registran los resultados de las consultas ejecutadas y los tiempos reportados por pgAdmin.
+
+## Repositorio
+
+GitHub: https://github.com/kevinncuervo/Hotel
+
+**Rama principal:** `main`.
