@@ -4,6 +4,9 @@
 -- Script 04: Control de reservas superpuestas
 
 -- Habilitar comparaciones de igualdad mediante GiST
+
+BEGIN;
+
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- Impedir reservas confirmadas superpuestas
@@ -16,3 +19,5 @@ ALTER TABLE reserva
     daterange(fecha_entrada, fecha_salida, '[)') WITH &&
   )
   WHERE (estado_reserva = 'Confirmada');
+
+COMMIT;

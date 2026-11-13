@@ -5,6 +5,8 @@
 
 -- Restricciones de la tabla habitacion
 
+BEGIN;
+
 ALTER TABLE habitacion
   ADD CONSTRAINT ck_habitacion_tipo
   CHECK (tipo IN ('Sencilla', 'Doble', 'Suite'));
@@ -38,3 +40,5 @@ ALTER TABLE pago
 ALTER TABLE pago
   ADD CONSTRAINT ck_pago_metodo
   CHECK (metodo IN ('Tarjeta', 'Efectivo', 'Transferencia'));
+
+COMMIT;

@@ -3,6 +3,7 @@
 -- Sistema de Gestion de Reservas para un Hotel
 -- Script 01: Creacion inicial de tablas
 
+BEGIN;
 -- Tabla cliente
 CREATE TABLE cliente (
   id_cliente SERIAL PRIMARY KEY,
@@ -50,3 +51,4 @@ CREATE TABLE pago (
     ON UPDATE CASCADE
     ON DELETE RESTRICT
 );
+COMMIT;

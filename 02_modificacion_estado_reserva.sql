@@ -4,6 +4,8 @@
 -- Script 02: Modificacion de la tabla reserva
 
 -- Agregar el estado de la reserva
+BEGIN;
 ALTER TABLE reserva
   ADD COLUMN estado_reserva VARCHAR(20)
   NOT NULL DEFAULT 'Confirmada';
+COMMIT;
